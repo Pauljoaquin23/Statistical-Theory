@@ -1,0 +1,158 @@
+---
+title: "Statistical theory - FA2"
+author: "Paul Joaquin M. Delos Santos"
+date: "2024-09-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem Statement (3.49)
+
+We are tasked with proving the equation:
+
+$$
+\sum_{j=1}^{N} (X_j - 1)^2 = \sum_{j=1}^{N} X_j^2 - 2 \sum_{j=1}^{N} X_j + N
+$$
+
+## Proof
+
+Let us start by expanding the left-hand side of the equation:
+
+$$
+\sum_{j=1}^{N} (X_j - 1)^2
+$$
+
+### Step 1: Expanding the square
+
+Expanding \( (X_j - 1)^2 \), we get:
+
+$$
+(X_j - 1)^2 = X_j^2 - 2X_j + 1
+$$
+
+Thus, we can rewrite the sum as:
+
+$$
+\sum_{j=1}^{N} (X_j - 1)^2 = \sum_{j=1}^{N} \left( X_j^2 - 2X_j + 1 \right)
+$$
+
+### Step 2: Splitting the sum
+
+Now, break the summation into parts:
+
+$$
+\sum_{j=1}^{N} \left( X_j^2 - 2X_j + 1 \right) = \sum_{j=1}^{N} X_j^2 - 2 \sum_{j=1}^{N} X_j + \sum_{j=1}^{N} 1
+$$
+
+### Step 3: Simplifying the constant sum
+
+Since the sum of \(1\) over \(N\) terms is just \(N\), we simplify this to:
+
+$$
+\sum_{j=1}^{N} 1 = N
+$$
+
+Thus, we now have:
+
+$$
+\sum_{j=1}^{N} (X_j - 1)^2 = \sum_{j=1}^{N} X_j^2 - 2 \sum_{j=1}^{N} X_j + N
+$$
+
+### Conclusion
+
+Therefore, we have proven that:
+
+$$
+\sum_{j=1}^{N} (X_j - 1)^2 = \sum_{j=1}^{N} X_j^2 - 2 \sum_{j=1}^{N} X_j + N
+$$
+
+The equation holds, as required.
+
+
+
+## Problem Statement (3.51)
+
+
+```{r}
+# Given values for U and V
+U <- c(3, -2, 5)
+V <- c(-4, -1, 6)
+
+# (a) PUV = sum(U * V)
+PUV <- sum(U * V)
+PUV
+# Explanation: This represents ∑U⋅V, the sum of the products of corresponding values of U and V.
+
+# (b) P(U + 3)(V - 4) = sum((U + 3) * (V - 4))
+PU_plus3_V_minus4 <- sum((U + 3) * (V - 4))
+PU_plus3_V_minus4
+# Explanation: This represents ∑(U + 3)(V - 4), the sum of the products after modifying U and V as described.
+
+# (c) PV² = sum(V^2)
+PV2 <- sum(V^2)
+PV2
+# Explanation: This is the sum of the squares of the values in V, ∑V².
+
+# (d) (sum(U)) * (sum(V))^2
+PU_sum <- sum(U)
+PV_sum <- sum(V)
+result_d <- PU_sum * (PV_sum^2)
+result_d
+# Explanation: Multiply the sum of U by the square of the sum of V, (∑U)(∑V)².
+
+# (e) PUV² = sum(U * V^2)
+PUV2 <- sum(U * V^2)
+PUV2
+# Explanation: This is ∑U⋅V², the sum of the products of U and the square of V.
+
+# (f) sum(U^2 - 2*V^2 + 2)
+result_f <- sum(U^2 - 2*V^2 + 2)
+result_f
+# Explanation: This calculates the sum after modifying U and V according to the given expression, ∑(U² - 2V² + 2).
+
+# (g) sum(U / V)
+result_g <- sum(U / V)
+result_g
+# Explanation: This computes the sum of the division of U by V, ∑(U/V).
+
+```
+
+
+## Problem Statement (3.51)
+3.90 Find the geometric mean of the sets (a) 3, 5, 8, 3, 7, 2 and (b) 28.5, 73.6, 47.2, 31.5, 64.8.
+
+$$
+\text{Geometric Mean} = \left(\prod_{i=1}^{n} x_i\right)^{\frac{1}{n}}
+$$
+
+### Set (a)
+
+The numbers are: 3, 5, 8, 3, 7, 2
+
+```{r}
+# Define the numbers for set (a)
+set_a <- c(3, 5, 8, 3, 7, 2)
+
+# Calculate the geometric mean for set (a)
+geometric_mean_a <- prod(set_a)^(1/length(set_a))
+geometric_mean_a
+
+```
+### Set (b)
+
+The numbers are: 28.5, 73.6, 47.2, 31.5, 64.8
+
+```{r}
+# Define the numbers for set (b)
+set_b <- c(28.5, 73.6, 47.2, 31.5, 64.8)
+
+# Calculate the geometric mean for set (b)
+geometric_mean_b <- prod(set_b)^(1/length(set_b))
+geometric_mean_b
+
+```
+
+
