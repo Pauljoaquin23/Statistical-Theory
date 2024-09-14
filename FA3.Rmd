@@ -1,0 +1,100 @@
+---
+title: "APM1111-FA3-Delos Santos"
+author: "Paul Joaquin M. Delos Santos"
+date: "2024-09-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(e1071)
+library(kableExtra)
+
+```
+
+
+## Test Scores Data
+The sample of test scores is as follows:
+
+```{r }
+scores <- c(88, 45, 53, 86, 33, 86, 85, 30, 89, 53, 41, 96, 56, 38, 62, 
+            71, 51, 86, 68, 29, 28, 47, 33, 37, 25, 36, 33, 94, 73, 46,
+            42, 34, 79, 72, 88, 99, 82, 62, 57, 42, 28, 55, 67, 62, 60,
+            96, 61, 57, 75, 93, 34, 75, 53, 32, 28, 73, 51, 69, 91, 35)
+
+n <- length(scores)  
+mean_score <- mean(scores)
+std_dev <- sd(scores)
+
+```
+## Descriptive Measures
+
+
+```{r, echo=FALSE}
+mean_score <- mean(scores)
+median_score <- median(scores)
+mode_score <- as.numeric(names(sort(table(scores), decreasing = TRUE)[1]))
+min_score <- min(scores)
+max_score <- max(scores)
+std_dev <- sd(scores)
+variance <- var(scores)
+q1 <- quantile(scores, 0.25)
+q2 <- quantile(scores, 0.50)
+q3 <- quantile(scores, 0.75)
+p90 <- quantile(scores, 0.90)
+p95 <- quantile(scores, 0.95)
+
+n <- length(scores)
+skewness_manual <- (n / ((n - 1) * (n - 2))) * sum(((scores - mean_score) / std_dev)^3)
+
+kurtosis_manual <- ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * 
+  sum(((scores - mean_score) / std_dev)^4) - 
+  (3 * (n - 1)^2) / ((n - 2) * (n - 3))
+
+std_error_skew <- 0.309  
+std_error_kurt <- 0.608  
+
+mean_score <- round(mean_score, 3)
+median_score <- round(median_score, 3)
+mode_score <- round(mode_score, 3)
+min_score <- round(min_score, 3)
+max_score <- round(max_score, 3)
+std_dev <- round(std_dev, 3)
+variance <- round(variance, 3)
+q1 <- round(q1, 3)
+q2 <- round(q2, 3)
+q3 <- round(q3, 3)
+p90 <- round(p90, 3)
+p95 <- round(p95, 3)
+skewness_manual <- round(skewness_manual, 3)
+kurtosis_manual <- round(kurtosis_manual, 3)
+std_error_skew <- round(std_error_skew, 3)
+std_error_kurt <- round(std_error_kurt, 3)
+
+results <- data.frame(
+  Descriptive_Measures = c("Valid", "Mode", "Median", "Mean", 
+                           "Std. Deviation", "Variance", "Skewness", 
+                           "Std. Error of Skewness", "Kurtosis", 
+                           "Std. Error of Kurtosis", "Minimum", 
+                           "Maximum", "25th Percentile", "50th Percentile", 
+                           "75th Percentile", "90th Percentile", "95th Percentile"),
+  Score = c(n, mode_score, median_score, mean_score, 
+            std_dev, variance, skewness_manual, std_error_skew, kurtosis_manual, 
+            std_error_kurt, min_score, max_score, q1, q2, q3, p90, p95)
+)
+
+highlighted_table <- results %>%
+  kbl() %>%
+  kable_styling(bootstrap_options = "striped", full_width = F) %>%
+  row_spec(which(results$Descriptive_Measures %in% c("Mode", "Mean", "Variance", 
+                                                     "Std. Error of Skewness", 
+                                                     "Std. Error of Kurtosis", 
+                                                     "Maximum", "50th Percentile", 
+                                                     "90th Percentile")), 
+           background = "gray")
+
+highlighted_table
+
+
+
+```
+
