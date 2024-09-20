@@ -1,0 +1,196 @@
+---
+title: 'Formative Assessment #6'
+author: "Paul Joaquin M. Delos Santos"
+date: "2024-09-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1) Table 1 shows a frequency distribution of grades on a final examination in college algebra. Find the quartiles of the distribution
+
+
+```{r cars}
+# Frequency data
+grades <- c("90-100", "80-89", "70-79", "60-69", "50-59", "40-49", "30-39")
+frequencies <- c(9, 32, 43, 21, 11, 3, 1)
+
+# Cumulative frequency
+cumulative_frequency <- cumsum(frequencies)
+n <- sum(frequencies)
+
+# Calculate quartiles
+Q1_position <- (n + 1) / 4
+Q2_position <- (n + 1) / 2
+Q3_position <- 3 * (n + 1) / 4
+
+# Determine the quartile ranges
+quartiles <- data.frame(
+  Quartile = c("Q1", "Q2", "Q3"),
+  Position = c(Q1_position, Q2_position, Q3_position),
+  Range = c(grades[which(cumulative_frequency >= Q1_position)[1]],
+            grades[which(cumulative_frequency >= Q2_position)[1]],
+            grades[which(cumulative_frequency >= Q3_position)[1]])
+)
+
+quartiles
+```
+
+## 2) On a final examination in statistics, the mean grade of a group of 150 students was 78 and the standard deviation was 8.0. In algebra, however, the mean finalgrade of the group was 73 and the standard deviation was 7.6. In which subject was there the greater (a) absolute dispersion and (b) relative dispersion?
+
+## Absolute dispersion
+```{r pressure}
+# Standard deviations
+sd_statistics <- 8.0
+sd_algebra <- 7.6
+
+# Comparing absolute dispersion
+absolute_dispersion <- c(Statistics = sd_statistics, Algebra = sd_algebra)
+absolute_dispersion
+
+```
+## Relative dispersion
+
+
+```{r }
+# Means
+mean_statistics <- 78
+mean_algebra <- 73
+
+# Coefficient of variation
+cv_statistics <- (sd_statistics / mean_statistics) * 100
+cv_algebra <- (sd_algebra / mean_algebra) * 100
+
+relative_dispersion <- c(Statistics = cv_statistics, Algebra = cv_algebra)
+relative_dispersion
+```
+
+## 3) Prove that the mean and standard deviation of a set of standard scores are equal to 0 and 1, respectively. Use the following problem to illustrate this: Convert the set 6, 2, 8, 7, 5 into standard scores.
+```{r}
+# Original dataset
+data <- c(6, 2, 8, 7, 5)
+
+# Calculate the mean  and standard deviation of the original dataset
+mean_data <- mean(data)
+sd_data <- sd(data)
+
+# Convert the original dataset into standard scores (z-scores)
+z_scores <- (data - mean_data) / sd_data
+
+# Calculate the mean and standard deviation of the z-scores
+mean_z <- mean(z_scores)
+sd_z <- sd(z_scores)
+
+# Output the results
+data.frame(
+  Original_Data = data,
+  Z_Scores = round(z_scores, 2)
+)
+
+# Display the mean and standard deviation of the original data and z-scores
+cat("Mean of original data:", round(mean_data, 2), "\n")
+cat("Standard deviation of original data:", round(sd_data, 2), "\n")
+cat("Mean of z-scores:", round(mean_z, 2), "\n")
+cat("Standard deviation of z-scores:", round(sd_z, 2), "\n")
+```
+
+## 4) Three masses are measured as 20.48, 35.97, and 62.34 g, with standarddeviations of 0.21, 0.46, and 0.54 g, respectively. Find the (a) mean and (b) standard deviation of the sum of the masses.
+
+(a) Mean of the Sum
+```{r}
+# Given 
+masses <- c(20.48, 35.97, 62.34)
+
+# Calculate the mean of the sum
+mean_sum <- sum(masses)
+mean_sum
+
+```
+
+(b) Standard Deviation of the Sum
+```{r}
+# Given standard deviations
+std_devs <- c(0.21, 0.46, 0.54)
+
+# Calculate the standard deviation of the sum
+std_dev_sum <- sqrt(sum(std_devs^2))
+std_dev_sum
+```
+
+## Results of mean of the sum and standard deviation of the sum 
+```{r, echo = FALSE}
+mean_sum
+std_dev_sum
+
+```
+
+## 5) The credit hour distribution at Metropolitan Technological College is as follows:
+x 6 9 12 15 18
+p(x) 0.1 0.2 0.4 0.2 0.1
+Find 𝜇 and 𝜎2 . Give the 25 (with replacement) possible samples of size 2, their means,
+and their probabilities.
+
+Calculating the mean and variance
+
+```{r, echo}
+
+## Given Data
+x <- c(6, 9, 12, 15, 18)
+p <- c(0.1, 0.2, 0.4, 0.2, 0.1)
+
+# Calculate mean
+mu <- sum(x * p)
+
+# Calculate variance 
+variance <- sum((x - mu)^2 * p)
+
+# Display the mean and variance
+cat("Mean:", mu, "\n")
+cat("Variance:", variance, "\n")
+```
+
+## Possible Samples of Size 2 
+```{r}
+# Generate all combinations of size 2 (with replacement)
+samples <- expand.grid(x1 = x, x2 = x)
+
+# Calculate means of the samples
+samples$mean <- rowMeans(samples)
+
+samples$probability <- p[match(samples$x1, x)] * p[match(samples$x2, x)]
+
+# Display the 25 possible samples with their probabilities
+print(samples)
+
+# Calculate probabilities for each unique mean
+mean_probabilities <- aggregate(probability ~ mean, data = samples, FUN = sum)
+
+# Combine with the sample means
+results <- merge(samples, mean_probabilities, by = "mean", all.x = TRUE)
+
+# Select relevant columns (x1, x2, mean, and mean probability)
+final_results <- results[, c("x1", "x2", "mean", "probability.y")]
+
+# Rename the columns for clarity
+colnames(final_results) <- c("x1", "x2", "mean", "mean_probability")
+
+# Display the final results with means and probabilities
+print(final_results)
+```
+
+## Result of mean and vairance 
+```{r, echo=FALSE}
+cat("Mean:", mu, "\n")
+cat("Variance:", variance, "\n")
+
+```
+
+## Sample Means and Probabilities
+
+```{r}
+
+final_results
+
+```
