@@ -1,0 +1,141 @@
+---
+title: "FA4 - STATS"
+author: "PAUL JOAQUIN M. DELOS SANTOS"
+date: "2024-09-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, digits = 2)
+library(dplyr)
+
+```
+
+## DATA SETS
+
+```{r }
+# Create the datasets
+normal <- c(67, 70, 63, 65, 68, 60, 70, 64, 69, 61,
+            66, 65, 71, 62, 66, 68, 64, 67, 62, 66,
+            65, 63, 66, 65, 63, 66)
+
+skewed_right <- c(69, 62, 67, 59, 66, 65, 63, 65, 60, 67,
+                  64, 68, 61, 69, 65, 62, 67, 70, 64, 63,
+                  68, 64, 65, 61, 66, 65)
+
+skewed_left <- c(31, 43, 30, 30, 38, 26, 29, 55, 46, 26,
+                 29, 57, 34, 34, 36, 40, 28, 26, 66, 63,
+                 30, 33, 24, 35, 34, 35)
+
+uniform <- c(40, 24, 29, 24, 27, 35, 33, 75, 38, 34,
+             85, 29, 40, 41, 35, 26, 34, 19, 23, 28,
+             26, 31, 22, 28, 31, 26)
+
+```
+
+
+
+
+## Raw Moments 
+
+```{r}
+# Function to calculate raw moments
+raw_moments <- function(data, order) {
+  return(mean(data^order))
+}
+
+# Calculate raw moments for each data
+raw_moments_normal <- sapply(1:4, function(i) raw_moments(normal, i))
+raw_moments_skewed_right <- sapply(1:4, function(i) raw_moments(skewed_right, i))
+raw_moments_skewed_left <- sapply(1:4, function(i) raw_moments(skewed_left, i))
+raw_moments_uniform <- sapply(1:4, function(i) raw_moments(uniform, i))
+
+raw_moments_results <- data.frame(
+  Moments = c("1st", "2nd", "3rd", "4th"),
+  Normal = round(raw_moments_normal, 2),
+  Skewed_Right = round(raw_moments_skewed_right, 2),
+  Skewed_Left = round(raw_moments_skewed_left, 2),
+  Uniform = round(raw_moments_uniform, 2)
+)
+
+raw_moments_results
+
+
+```
+
+
+## Centered Moments About the Mean
+
+```{r}
+# Function to calculate centered moments
+centered_moments <- function(data, order) {
+  mean_data <- mean(data)
+  return(mean((data - mean_data)^order))
+}
+
+# Calculate centered moments for each data
+centered_moments_normal <- sapply(1:4, function(i) centered_moments(normal, i))
+centered_moments_skewed_right <- sapply(1:4, function(i) centered_moments(skewed_right, i))
+centered_moments_skewed_left <- sapply(1:4, function(i) centered_moments(skewed_left, i))
+centered_moments_uniform <- sapply(1:4, function(i) centered_moments(uniform, i))
+
+centered_moments_results <- data.frame(
+  Moments = c("1st", "2nd", "3rd", "4th"),
+  Normal = round(centered_moments_normal, 2),
+  Skewed_Right = round(centered_moments_skewed_right, 2),
+  Skewed_Left = round(centered_moments_skewed_left, 2),
+  Uniform = round(centered_moments_uniform, 2)
+)
+
+centered_moments_results
+
+```
+
+## Moments About the Number 75
+
+
+```{r}
+# Function to calculate moments about a specific value
+moments_about_value <- function(data, value, order) {
+  return(mean((data - value)^order))
+}
+
+# Calculate moments about 75
+moments_about_75 <- sapply(1:4, function(i) moments_about_value(normal, 75, i))
+
+moments_about_75_results <- data.frame(
+  Moments = c("1st", "2nd", "3rd", "4th"),
+  Moments_About_75 = round(moments_about_75, 2)
+)
+
+moments_about_75_results
+
+
+```
+
+## Verification of Relations
+
+
+```{r}
+# Extract moments for verification
+m0_normal <- raw_moments_normal[1]
+m1_normal <- centered_moments_normal[1]
+m2_normal <- centered_moments_normal[2]
+m3_normal <- centered_moments_normal[3]
+m4_normal <- centered_moments_normal[4]
+
+# Verify relations
+relation_m2 <- all.equal(m2_normal, m0_normal^2 - m1_normal^2)
+relation_m3 <- all.equal(m3_normal, m0_normal^3 - 3 * m0_normal * m1_normal * m2_normal + 2 * m1_normal^3)
+relation_m4 <- all.equal(m4_normal, m0_normal^4 - 4 * m0_normal * m1_normal * m3_normal + 6 * m1_normal^2 * m2_normal - 3 * m1_normal^4)
+
+verification_results <- data.frame(
+  Relation = c("m2", "m3", "m4"),
+  Verified = c(relation_m2, relation_m3, relation_m4)
+)
+
+
+verification_results
+
+
+```
