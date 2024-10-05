@@ -1,0 +1,129 @@
+---
+title: "FA7"
+author: "Paul Joaquin M. Delos Santos"
+date: "2024-09-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(ggplot2)
+library(dplyr)
+library(car) # for Levene's Test
+library(stats)
+
+
+```
+
+
+
+```{r }
+# Create the dataset
+data <- data.frame(
+  Participant = 1:24,
+  Cloak = c(rep(0, 12), rep(1, 12)),
+  Mischief = c(3, 1, 5, 4, 6, 4, 6, 2, 0, 5, 4, 5,
+               4, 3, 6, 6, 8, 5, 5, 4, 2, 5, 7, 5)
+)
+```
+
+## Assumptions Checks
+Assumption 1: Continuous Dependent Variable
+The dependent variable (Mischief) is continuous.
+
+# Assumption 2: Independent Groups
+The independent variable (Cloak) consists of two categorical, independent groups.
+
+# Assumption 3: Independence of Observations
+Each participant belongs to only one group.
+
+# Assumption 4: Outliers
+```{r }
+# Boxplot to inspect outliers
+ggplot(data, aes(x = factor(Cloak), y = Mischief)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Mischief by Cloak Status",
+       x = "Cloak Status (0 = Without, 1 = With)",
+       y = "Number of Mischievous Acts")
+```
+
+# Assumption 5: Normality
+```{r}
+# Shapiro-Wilk test for normality
+shapiro_test_without_cloak <- shapiro.test(data$Mischief[data$Cloak == 0])
+shapiro_test_with_cloak <- shapiro.test(data$Mischief[data$Cloak == 1])
+
+shapiro_test_without_cloak
+shapiro_test_with_cloak
+
+
+```
+
+# Assumption 6: Homogeneity of Variances
+```{r}
+# Levene's Test for homogeneity of variances
+levene_test_result <- leveneTest(Mischief ~ factor(Cloak), data = data)
+levene_test_result
+
+
+
+
+```
+
+
+# Comparison of two means 
+```{r}
+
+# Comparison of Two Means 
+# Calculate group means
+library(dplyr) # Ensure dplyr is loaded
+group_means <- data %>%
+  group_by(Cloak) %>%
+  summarise(Mean_Mischief = mean(Mischief), .groups = 'drop')
+
+# Print group means
+print(group_means)
+
+# Simple bar plot to visualize means
+ggplot(group_means, aes(x = factor(Cloak), y = Mean_Mischief, fill = factor(Cloak))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = round(Mean_Mischief, 2)), vjust = -0.5) +
+  labs(title = "Comparison of Mischief by Cloak Status",
+       x = "Cloak Status (0 = Without, 1 = With)",
+       y = "Mean Number of Mischievous Acts") +
+  theme_minimal()
+
+
+
+```
+
+
+
+ rain cloud plot "# Raincloud plot to visualize means
+ 
+```{r}
+ggplot(data, aes(x = factor(Cloak), y = Mischief, fill = factor(Cloak))) +
+  geom_violin(trim = TRUE, alpha = 0.5) +
+  geom_jitter(aes(color = factor(Cloak)), width = 0.1, alpha = 0.5) +
+  labs(title = "Raincloud Plot of Mischief by Cloak Status",
+       x = "Cloak Status (0 = Without, 1 = With)",
+       y = "Number of Mischievous Acts") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+
+  
+  
+```
+  
+  
+# Independent Samples T-Test
+```{r}
+# Conducting the independent samples t-test
+t_test_result <- t.test(Mischief ~ Cloak, data = data)
+t_test_result
+
+
+
+```
