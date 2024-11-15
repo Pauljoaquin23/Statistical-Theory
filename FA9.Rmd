@@ -1,0 +1,124 @@
+---
+title: "FA9"
+author: "PAUL JOAQUIN DELOS SANTOS"
+date: "2024-11-14"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Load necessary libraries
+library(tidyverse)
+library(car)
+library(ez)
+library(ggpubr)
+
+political_data <- tibble(
+  gender = c(rep(1, 28), rep(2, 30)),  # Adjusted to match 58 total rows
+  education_level = c(
+    rep(1, 10), rep(2, 9), rep(3, 9),  # Gender 1
+    rep(1, 10), rep(2, 10), rep(3, 10) # Gender 2
+  ),
+  political_interest = c(
+    # Gender 1
+    38, 39, 35, 38, 41, 40, 36, 37, 33, 38, # Edu level 1
+    41.5, 41.5, 44.5, 44.5, 44, 46.5, 42, 43.5, 38.5, # Edu level 2
+    63, 64, 61, 64, 69, 69, 66, 62, 63, # Edu level 3
+    # Gender 2
+    40, 41, 36, 39, 44, 44, 42, 38, 38, 34, # Edu level 1
+    45, 46, 41, 44, 49, 49, 47, 43, 43, 39, # Edu level 2
+    57, 58, 63, 66, 65, 61, 59, 55, 45, 51  # Edu level 3
+  )
+)
+
+# Inspect the data
+head(political_data)
+summary(political_data)
+
+```
+
+## Data Exploration and Visualization
+
+```{r}
+# Boxplot of Political Interest by Gender and Education Level
+ggboxplot(political_data, x = "education_level", y = "political_interest", 
+          color = "gender", palette = "jco", 
+          xlab = "Education Level", 
+          ylab = "Political Interest",
+          legend.title = "Gender")
+
+
+
+```
+
+## Two-Way ANOVA
+# Assumptions
+# Normality
+
+```{r}
+# Shapiro-Wilk test for each group
+political_data %>%
+  group_by(gender, education_level) %>%
+  summarise(shapiro_p = shapiro.test(political_interest)$p.value)
+
+```
+
+# Homogeneity of Variances
+. 
+```{r}
+# Levene's Test
+# Convert 'gender' and 'education_level' to factors
+political_data <- political_data %>%
+  mutate(
+    gender = factor(gender, labels = c("Male", "Female")),
+    education_level = factor(education_level, labels = c("Low", "Medium", "High"))
+  )
+
+# Verify structure
+str(political_data)
+
+# Perform Levene's Test
+library(car)
+leveneTest(political_interest ~ gender * education_level, data = political_data)
+```
+
+## Two-Way ANOVA
+
+```{r}
+# Perform the two-way ANOVA
+anova_results <- aov(political_interest ~ gender * education_level, data = political_data)
+summary(anova_results)
+
+
+```
+## APA Reporting
+
+```{r}
+# Add unique identifier
+political_data <- political_data %>%
+  mutate(
+    id = row_number(),  # Unique identifier
+    gender = factor(gender, labels = c("Male", "Female")),
+    education_level = factor(education_level, labels = c("Low", "Medium", "High"))
+  )
+
+# Run ezANOVA
+library(ez)
+anova_table <- ezANOVA(
+  data = political_data,
+  dv = political_interest,
+  wid = id,  # Use the unique identifier
+  between = c("gender", "education_level"),
+  detailed = TRUE
+)
+
+# View results
+anova_table
+
+```
+
+## Conclusion
+Based on the results, we fail to reject/reject the null hypothesis. The findings suggest (add interpretation here).
+
