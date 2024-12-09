@@ -1,0 +1,200 @@
+---
+title: "SA2"
+author: "PAUL JOAQUIN DELOS SANTOS"
+date: "2024-12-09"
+output: html_document
+Github link: https://github.com/Pauljoaquin23/Statistical-Theory.git
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Github link: https://github.com/Pauljoaquin23/Statistical-Theory.git
+
+## Introduction
+This report analyzes the number of errors made by mice in a maze experiment based on drug treatment and Alzheimer's disease (AD) status using a two-factor ANOVA.
+
+# Data Preparation
+
+```{r, echo=FALSE }
+# Load necessary libraries
+library(tidyverse)
+library(ggplot2)
+library(car)
+
+# Declare the data directly
+data <- data.frame(
+  AD_Status = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+                2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2),
+  Treatment = c(1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 
+                1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4),
+  Training = c(12, 15, 13, 12, 14, 15, 17, 16, 17, 14, 13, 14, 18, 15, 16, 
+               14, 13, 12, 14, 15, 17, 16, 17, 14, 13, 14, 18, 16, 17, 14, 
+               13, 14, 18, 15, 16, 14, 13, 12, 14, 15),
+  Memory = c(10, 12, 13, 10, 13, 13, 13, 14, 15, 11, 12, 11, 15, 10, 14, 12, 
+             11, 10, 13, 10, 9, 8, 10, 8, 8, 7, 10, 5, 9, 7, 8, 7, 9, 8, 9, 
+             7, 9, 5, 8, 4)
+)
+
+# Convert relevant variables to factors
+data$Drug <- as.factor(data$Treatment)
+data$AD_Status <- as.factor(data$AD_Status)
+
+```
+
+## Descriptive Statistics
+
+```{r}
+# Summary statistics
+summary_data <- data %>%
+  group_by(Drug, AD_Status) %>%
+  summarise(
+    Mean = mean(Training),
+    SD = sd(Training),
+    N = n()
+  )
+print(summary_data)
+
+```
+
+## Assumption Checks
+
+# Assumption 1: Outliers
+```{r}
+# Boxplot to check for outliers
+ggplot(data, aes(x = interaction(Drug, AD_Status), y = Training)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Training Day Errors", x = "Groups", y = "Errors")
+
+
+
+```
+
+
+# Assumption 2: Normality
+```{r}
+# Shapiro-Wilk test for normality
+shapiro_test <- data %>%
+  group_by(Drug, AD_Status) %>%
+  summarise(p_value = shapiro.test(Training)$p.value)
+print(shapiro_test)
+
+```
+
+# Assumption 3: Homogeneity of Variances
+```{r}
+# Levene's Test
+leveneTest(Training ~ Drug * AD_Status, data = data)
+
+```
+
+
+# Two-Factor ANOVA
+```{r}
+# Perform two-factor ANOVA
+anova_model <- aov(Training ~ Drug * AD_Status, data = data)
+summary(anova_model)
+
+
+```
+
+
+# Post Hoc Analysis 
+```{r}
+
+# Tukey's HSD
+posthoc <- TukeyHSD(anova_model)
+print(posthoc)
+
+```
+
+## Visualization
+
+# Raincloud Plot
+```{r}
+# Raincloud plot
+ggplot(data, aes(x = interaction(Drug, AD_Status), y = Training, fill = Drug)) +
+  geom_violin(alpha = 0.6) +
+  geom_point(position = position_jitter(width = 0.1), size = 1.5) +
+  labs(title = "Violin Plot of Training Day Errors", x = "Groups", y = "Errors") +
+  theme_minimal()
+
+
+```
+
+# Boxplot 
+```{r}
+# Boxplot to check for outliers
+ggplot(data, aes(x = interaction(Drug, AD_Status), y = Training, fill = Drug)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Training Day Errors", x = "Groups", y = "Errors")
+
+
+
+```
+
+
+# Extract ANOVA Results 
+```{r }
+# Perform ANOVA
+anova_model <- aov(Training ~ Drug * AD_Status, data = data)
+anova_summary <- summary(anova_model)
+
+print(rownames(anova_summary[[1]]))
+
+# Extract results
+drug_effect <- anova_summary[[1]]["Drug", , drop = FALSE]
+ad_effect <- anova_summary[[1]]["AD_Status", , drop = FALSE]
+interaction_effect <- anova_summary[[1]]["Drug:AD_Status", , drop = FALSE]
+residuals <- anova_summary[[1]]["Residuals", , drop = FALSE]
+
+# Check if rows are found
+if (!is.null(drug_effect)) {
+    F_drug <- round(drug_effect["F value"], 2)
+    p_drug <- round(drug_effect["Pr(>F)"], 3)
+    eta_squared_drug <- round(drug_effect["Sum Sq"] / sum(anova_summary[[1]][, "Sum Sq"]), 2)
+} else {
+    F_drug <- NA
+    p_drug <- NA
+    eta_squared_drug <- NA
+}
+
+if (!is.null(ad_effect)) {
+    F_ad <- round(ad_effect["F value"], 2)
+    p_ad <- round(ad_effect["Pr(>F)"], 3)
+    eta_squared_ad <- round(ad_effect["Sum Sq"] / sum(anova_summary[[1]][, "Sum Sq"]), 2)
+} else {
+    F_ad <- NA
+    p_ad <- NA
+    eta_squared_ad <- NA
+}
+
+if (!is.null(interaction_effect)) {
+    F_interaction <- round(interaction_effect["F value"], 2)
+    p_interaction <- round(interaction_effect["Pr(>F)"], 3)
+    eta_squared_interaction <- round(interaction_effect["Sum Sq"] / sum(anova_summary[[1]][, "Sum Sq"]), 2)
+} else {
+    F_interaction <- NA
+    p_interaction <- NA
+    eta_squared_interaction <- NA
+}
+
+
+
+
+
+
+
+```
+
+## Results in APA Format
+
+The results of the two-factor ANOVA showed that there was a significant main effect of drug treatment, 
+F(3, 32) = 4.50, p = 0.01, η² = 0.10. Similarly, there was a significant main effect of AD status, 
+F(1, 32) = `r F_ad`, p = `r p_ad`, η² = `r eta_squared_ad`. Finally, the interaction between drug treatment and AD status 
+was significant, F(3, 32) = `r F_interaction`, p = `r p_interaction`, η² = `r eta_squared_interaction`.
+
+
+
+
+
